@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCRIPT: PHONG FPS V4 - BẢN ULTIMATE (RAINBOW UI + MULTI SKY + FULL KORBLOX)
+-- SCRIPT: PHONG FPS V4 - FINAL PRO EDITION (FIXED SKY + NO SUN GLARE + MOBILE UI)
 -- =============================================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -8,19 +8,18 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
--- Xóa menu cũ nếu đang chạy
 if _G.PhongFPSUI then
     _G.PhongFPSUI:Destroy()
 end
 
--- ================= 1. TẠO MENU UI & HIỆU ỨNG RAINBOW =================
+-- ================= 1. CREATE UI & RAINBOW EFFECT =================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = (gethui and gethui()) or CoreGui
 ScreenGui.Name = "PhongFPSBoosterV4"
 _G.PhongFPSUI = ScreenGui
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 260, 0, 300) -- Đủ chỗ cho 6 nút chức năng
+MainFrame.Size = UDim2.new(0, 260, 0, 250)
 MainFrame.Position = UDim2.new(0.5, -130, 0.1, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 MainFrame.BorderSizePixel = 0
@@ -29,20 +28,40 @@ MainFrame.Draggable = true
 MainFrame.ClipsDescendants = true
 MainFrame.Parent = ScreenGui
 
--- Tạo viền Rainbow cho Menu
 local UIStroke = Instance.new("UIStroke")
 UIStroke.Thickness = 2.5
 UIStroke.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 32)
-Title.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
-Title.Text = "⚡ PHONG FPS V4 [RAINBOW] ⚡"
+Title.Size = UDim2.new(1, -35, 0, 32)
+Title.Position = UDim2.new(0, 8, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "⚡ PHONG FPS V4 [PRO]"
+Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 14
 Title.Parent = MainFrame
 
--- Vòng lặp chạy màu Rainbow cho viền và chữ tiêu đề
+-- Dedicated Minimize Button (+/-) at top-right corner
+local MinBtn = Instance.new("TextButton")
+MinBtn.Size = UDim2.new(0, 32, 0, 32)
+MinBtn.Position = UDim2.new(1, -32, 0, 0)
+MinBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+MinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinBtn.Text = "-"
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.TextSize = 18
+MinBtn.BorderSizePixel = 0
+MinBtn.Parent = MainFrame
+
+local isMinimized = false
+MinBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    MainFrame.Size = isMinimized and UDim2.new(0, 260, 0, 32) or UDim2.new(0, 260, 0, 250)
+    MinBtn.Text = isMinimized and "+" or "-"
+end)
+
+-- Rainbow Animation Loop
 task.spawn(function()
     local hue = 0
     while MainFrame and MainFrame.Parent do
@@ -54,31 +73,31 @@ task.spawn(function()
     end
 end)
 
--- Hàm tạo nút Toggle chuẩn
+-- Standard Toggle Button Builder
 local function CreateToggle(name, yPos, callback)
     local ToggleBtn = Instance.new("TextButton")
-    ToggleBtn.Size = UDim2.new(1, -20, 0, 30)
+    ToggleBtn.Size = UDim2.new(1, -20, 0, 32)
     ToggleBtn.Position = UDim2.new(0, 10, 0, yPos)
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 40, 40)
     ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    ToggleBtn.Text = name .. " [TẮT]"
+    ToggleBtn.Text = name .. " [OFF]"
     ToggleBtn.Font = Enum.Font.GothamSemibold
-    ToggleBtn.TextSize = 13
+    ToggleBtn.TextSize = 12
     ToggleBtn.Parent = MainFrame
 
     local isOn = false
     ToggleBtn.MouseButton1Click:Connect(function()
         isOn = not isOn
         ToggleBtn.BackgroundColor3 = isOn and Color3.fromRGB(40, 150, 40) or Color3.fromRGB(150, 40, 40)
-        ToggleBtn.Text = name .. (isOn and " [BẬT]" or " [TẮT]")
+        ToggleBtn.Text = name .. (isOn and " [ON]" or " [OFF]")
         callback(isOn)
     end)
     return ToggleBtn
 end
 
--- ================= 2. CHỨC NĂNG 1: NO FOG (XÓA SƯƠNG MÙ TẬN GỐC) =================
+-- ================= 2. FEATURE 1: NO FOG =================
 local noFogLoop = nil
-CreateToggle("No Fog (Nhìn Xuyên Sương Mù)", 42, function(state)
+CreateToggle("No Fog (Clear Vision)", 42, function(state)
     if state then
         noFogLoop = task.spawn(function()
             while task.wait(1) do
@@ -98,8 +117,8 @@ CreateToggle("No Fog (Nhìn Xuyên Sương Mù)", 42, function(state)
     end
 end)
 
--- ================= 3. CHỨC NĂNG 2: LỘT DA MAP (FIX LAG) =================
-CreateToggle("Lột Da Map & Tắt Hạt", 80, function(state)
+-- ================= 3. FEATURE 2: POTATO GRAPHICS =================
+CreateToggle("Remove Textures & Particles", 82, function(state)
     if not state then return end
     task.spawn(function()
         if Workspace.Terrain then
@@ -128,8 +147,8 @@ CreateToggle("Lột Da Map & Tắt Hạt", 80, function(state)
     end)
 end)
 
--- ================= 4. CHỨC NĂNG 3: TẮT ĐÈN & BÓNG ĐỔ =================
-CreateToggle("Tắt Hắt Sáng & Bóng Đổ", 118, function(state)
+-- ================= 4. FEATURE 3: DISABLE LIGHTS & SHADOWS =================
+CreateToggle("Disable Lights & Shadows", 122, function(state)
     Lighting.GlobalShadows = not state
     for _, v in pairs(Workspace:GetDescendants()) do
         if v:IsA("PointLight") or v:IsA("SurfaceLight") or v:IsA("SpotLight") then
@@ -138,37 +157,37 @@ CreateToggle("Tắt Hắt Sáng & Bóng Đổ", 118, function(state)
     end
 end)
 
--- ================= 5. CHỨC NĂNG 4: ĐỔI BẦU TRỜI (BẤM ĐỂ CHUYỂN THEME) =================
+-- ================= 5. FEATURE 4: SKYBOX CHANGER (NO WHITE SUN GLARE) =================
 local SkyThemes = {
     {
-        Name = "Hoàng Hôn Chill",
+        Name = "Chill Sunset",
         Time = "17:30:00",
         Bk = "rbxassetid://600886090", Dn = "rbxassetid://600831635", Ft = "rbxassetid://600832720",
         Lf = "rbxassetid://600886116", Rt = "rbxassetid://600833862", Up = "rbxassetid://600835336"
     },
     {
-        Name = "Galaxy Vũ Trụ",
+        Name = "Deep Galaxy",
         Time = "00:00:00",
         Bk = "rbxassetid://159454299", Dn = "rbxassetid://159454296", Ft = "rbxassetid://159454293",
         Lf = "rbxassetid://159454286", Rt = "rbxassetid://159454300", Up = "rbxassetid://159454288"
     },
     {
-        Name = "Black Hole (Hố Đen)",
-        Time = "02:00:00",
-        Bk = "rbxassetid://12064107", Dn = "rbxassetid://12064152", Ft = "rbxassetid://12064121",
-        Lf = "rbxassetid://12063984", Rt = "rbxassetid://12064115", Up = "rbxassetid://12064131"
+        Name = "Black Hole",
+        Time = "00:00:00",
+        Bk = "rbxassetid://16553658937", Dn = "rbxassetid://16553660713", Ft = "rbxassetid://16553662144",
+        Lf = "rbxassetid://16553664042", Rt = "rbxassetid://16553665766", Up = "rbxassetid://16553667750"
     }
 }
 
 local currentSkyIndex = 0
 local SkyBtn = Instance.new("TextButton")
-SkyBtn.Size = UDim2.new(1, -20, 0, 30)
-SkyBtn.Position = UDim2.new(0, 10, 0, 156)
+SkyBtn.Size = UDim2.new(1, -20, 0, 32)
+SkyBtn.Position = UDim2.new(0, 10, 0, 162)
 SkyBtn.BackgroundColor3 = Color3.fromRGB(60, 80, 160)
 SkyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SkyBtn.Text = "Đổi Sky: [Mặc Định]"
+SkyBtn.Text = "Sky Theme: [Default]"
 SkyBtn.Font = Enum.Font.GothamSemibold
-SkyBtn.TextSize = 13
+SkyBtn.TextSize = 12
 SkyBtn.Parent = MainFrame
 
 SkyBtn.MouseButton1Click:Connect(function()
@@ -177,13 +196,15 @@ SkyBtn.MouseButton1Click:Connect(function()
         currentSkyIndex = 0
     end
 
-    -- Xóa Sky cũ
+    -- Clear existing Sky & Sun glare effects
     for _, v in pairs(Lighting:GetChildren()) do
-        if v:IsA("Sky") then v:Destroy() end
+        if v:IsA("Sky") or v:IsA("SunRaysEffect") or v:IsA("BloomEffect") then
+            v:Destroy()
+        end
     end
 
     if currentSkyIndex == 0 then
-        SkyBtn.Text = "Đổi Sky: [Mặc Định]"
+        SkyBtn.Text = "Sky Theme: [Default]"
         SkyBtn.BackgroundColor3 = Color3.fromRGB(60, 80, 160)
         Lighting.TimeOfDay = "14:00:00"
     else
@@ -193,6 +214,7 @@ SkyBtn.MouseButton1Click:Connect(function()
         Lighting.TimeOfDay = theme.Time
 
         local sky = Instance.new("Sky")
+        sky.CelestialBodiesShown = false -- Removes the big white Sun/Moon circle!
         sky.SkyboxBk = theme.Bk
         sky.SkyboxDn = theme.Dn
         sky.SkyboxFt = theme.Ft
@@ -203,14 +225,13 @@ SkyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- ================= 6. CHỨC NĂNG 5: CỤT ĐẦU GIỮ TÓC + FULL KORBLOX R15/R6 =================
+-- ================= 6. FEATURE 5: HEADLESS (KEEP HAIR) + FULL KORBLOX =================
 local isSkinActive = false
 
 local function ApplyRichKidSkin(char)
     if not char then return end
     local alpha = isSkinActive and 1 or 0
 
-    -- 1. Cụt đầu nhưng GIỮ NGUYÊN tóc/mũ (Chỉ tàng hình Head và Face)
     local head = char:FindFirstChild("Head")
     if head then
         head.Transparency = alpha
@@ -218,55 +239,26 @@ local function ApplyRichKidSkin(char)
         if head:FindFirstChild("Mesh") then head.Mesh.Transparency = alpha end
     end
 
-    -- 2. Full Korblox R15 (Xóa sạch cả 3 khúc: Đùi trên, Bắp chân, Bàn chân)
     local r15Parts = {"RightUpperLeg", "RightLowerLeg", "RightFoot"}
     for _, partName in ipairs(r15Parts) do
         local part = char:FindFirstChild(partName)
         if part then part.Transparency = alpha end
     end
 
-    -- 3. Korblox cho R6
     local r6Leg = char:FindFirstChild("Right Leg")
     if r6Leg then r6Leg.Transparency = alpha end
 end
 
--- Tự động áp dụng lại nếu nhân vật bị chết và hồi sinh
 Players.LocalPlayer.CharacterAdded:Connect(function(newChar)
-    task.wait(0.5) -- Đợi nhân vật load xong các khớp
+    task.wait(0.5)
     if isSkinActive then
         ApplyRichKidSkin(newChar)
     end
 end)
 
-CreateToggle("Cụt Đầu (Giữ Tóc) + Full Korblox", 194, function(state)
+CreateToggle("Headless + Full Korblox", 202, function(state)
     isSkinActive = state
     ApplyRichKidSkin(Players.LocalPlayer.Character)
 end)
 
--- ================= 7. NÚT ẨN / HIỆN MENU =================
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Size = UDim2.new(1, 0, 0, 22)
-CloseBtn.Position = UDim2.new(0, 0, 1, -22)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
-CloseBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-CloseBtn.Text = "[ Thu Gọn Menu ]"
-CloseBtn.Font = Enum.Font.Gotham
-CloseBtn.TextSize = 12
-CloseBtn.Parent = MainFrame
-
-local isMinimized = false
-CloseBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    MainFrame.Size = isMinimized and UDim2.new(0, 260, 0, 32) or UDim2.new(0, 260, 0, 300)
-    CloseBtn.Visible = not isMinimized
-end)
-
-Title.InputBegan:Connect(function(input)
-    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and isMinimized then
-        isMinimized = false
-        MainFrame.Size = UDim2.new(0, 260, 0, 300)
-        CloseBtn.Visible = true
-    end
-end)
-
-print("[Phong FPS V4 Ultimate] Đã load! Cụt chân R15 fix triệt để + Rainbow UI!")
+print("[Phong FPS V4] Final Pro Edition Loaded!")
